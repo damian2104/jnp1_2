@@ -2,16 +2,23 @@
 #include "strdeque.h"
 #include "strdequeconst.h"
 
-static bool debug_mode = true;
+#ifndef NDEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
 
-#ifdef DNDEBUG
-#define NDEBUG
-debug_mode = false;
-#endif // DNDEBUG
+namespace {
 
+
+    bool debug_mode() {
+        static std::ios_base::Init init;
+        return debug;
+    }
+}
 
 unsigned long emptystrdeque() {
-    if (debug_mode) {
+   if (debug_mode()) {
         std::cerr << "emptystrdeque()\n";
     }
     static unsigned long id =  strdeque_new();

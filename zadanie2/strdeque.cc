@@ -2,16 +2,15 @@
 #include <map>
 #include <deque>
 #include <iostream>
-#include<assert.h>
+#include <cassert>
 #include "strdeque.h"
 #include "strdequeconst.h"
 
-static bool debug_mode = true;
-
-#ifdef DNDEBUG
-#define NDEBUG
-debug_mode = false;
-#endif // DNDEBUG
+#ifndef NDEBUG
+static const bool debug = true;
+#else
+static const bool debug = false;
+#endif
 
 namespace {
 
@@ -23,9 +22,16 @@ namespace {
         return id;
     }
 
+
     my_map& strings() {
         static my_map* strings = new my_map;
         return *strings;
+    }
+
+
+    bool debug_mode() {
+        static std::ios_base::Init init;
+        return debug;
     }
 
     unsigned long next_id() {
@@ -64,15 +70,16 @@ namespace {
         return 0;
     }
 }
+
 unsigned long strdeque_new() {
-    if (debug_mode) {
+    if (debug_mode()) {
         std::cerr << "strdeque_new()\n";
     }
     my_deq new_deq;
     unsigned long id = next_id();
     std:: pair<unsigned long, my_deq> new_entry = std::make_pair (id, new_deq);
     strings().insert(new_entry);
-    if (debug_mode) {
+    if (debug_mode()) {
         std::cerr << "deque " << id << " created\n";
     }
     return id;
@@ -80,25 +87,27 @@ unsigned long strdeque_new() {
 
 void strdeque_delete(unsigned long id) {
     if (id == const_id()) {
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_delete(the Empty Deque)\n";
         }
         return;
     }
     strings().erase(id);
-    std::cerr << "strdeque_delete: deque " << id << " deleted\n";
+    if (debug_mode()) {
+        std::cerr << "strdeque_delete: deque " << id << " deleted\n";
+    }
 }
 
 size_t strdeque_size(unsigned long id) {
     bool success = false;
     my_deq& deq = find_deq(id, success);
     if(!success) {
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_size: deque does not exist\n";
         }
         return 0;
     }
-    if (debug_mode) {
+    if (debug_mode()) {
         std::cerr << "strdeque_size: " << deq.size() << "\n";
     }
     return (deq.size());
@@ -107,7 +116,7 @@ size_t strdeque_size(unsigned long id) {
 
 void strdeque_insert_at(unsigned long id, size_t pos, const char* value) {
     if (id == const_id() || value == NULL) {
-        if (debug_mode) {
+        if (debug_mode()) {
             if (id == const_id()) {
                 std::cerr << "strdeque_insert_at: attempt to insert into the Empty Deque\n";
             }
@@ -120,21 +129,21 @@ void strdeque_insert_at(unsigned long id, size_t pos, const char* value) {
     bool success = false;
     my_deq& deq = find_deq(id, success);
     if(!success) {
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_insert_at: deque " << id << " does not exist\n";
         }
         return;
     }
     if (pos > deq.size()) {
         deq.insert(deq.end(), value);
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_insert_at: deque " << id << ", element " << value << " inserted at the end\n";
         }
     }
     else {
         std::string str(value);
         deq.insert(deq.begin()+pos, str);
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_insert_at: deque " << id << ", element " << value << " inserted at " << pos << "\n";
         }
     }
@@ -142,7 +151,7 @@ void strdeque_insert_at(unsigned long id, size_t pos, const char* value) {
 
 void strdeque_remove_at(unsigned long id, size_t pos){
     if(id == const_id()) {
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_remove_at: attempt to remove the Empty Deque\n";
         }
         return;
@@ -150,7 +159,7 @@ void strdeque_remove_at(unsigned long id, size_t pos){
     bool success = false;
     my_deq& deq = find_deq(id, success);
     if(!success || pos >= deq.size()) {
-        if (debug_mode) {
+        if (debug_mode()) {
             if (!success) {
                 std::cerr << "strdeque_remove_at: deque " << id << " does not exist\n";
             }
@@ -161,7 +170,7 @@ void strdeque_remove_at(unsigned long id, size_t pos){
         return;
     }
     deq.erase(deq.begin()+pos);
-    if (debug_mode) {
+    if (debug_mode()) {
         std::cerr << "strdeque_remove_at: deque " << id << ", element at " << pos << " removed\n";
     }
 }
@@ -169,18 +178,21 @@ void strdeque_remove_at(unsigned long id, size_t pos){
 const char* strdeque_get_at(unsigned long id, size_t pos){
     bool success = false;
     my_deq& deq = find_deq(id, success);
-    if (!success || pos >= deq.size()) {
-        if (debug_mode) {
-            if (!success) {
-                std::cerr << "strdeque_get_at: deque " << id << " does not exist\n";
-            }
-            if (pos >= deq.size()) {
-                std::cerr << "strdeque_get_at: position " << pos << " does not exist in deque " << id << "\n";
-            }
+    if (!success) {
+        if (debug_mode()) {
+
+            std::cerr << "strdeque_get_at: deque " << id << " does not exist\n";
         }
         return NULL;
     }
-    if (debug_mode) {
+
+    if (pos >= deq.size()) {
+        if (debug_mode()) {
+            std::cerr << "strdeque_get_at: position " << pos << " does not exist in deque " << id << "\n";
+        }
+        return NULL;
+    }
+    if (debug_mode()) {
         std::cerr << "strdeque_get_at: deque " << id << ", element at " << pos << " is " << (deq[pos]).c_str() << "\n";
     }
     return (deq[pos]).c_str();
@@ -188,7 +200,7 @@ const char* strdeque_get_at(unsigned long id, size_t pos){
 
 void strdeque_clear(unsigned long id){
     if (id == const_id()) {
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_clear: attempt to clear the Empty Deque\n";
         }
         return;
@@ -196,13 +208,13 @@ void strdeque_clear(unsigned long id){
     bool success = false;
     my_deq& deq = find_deq(id, success);
     if (!success) {
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_clear: deque does not exist\n";
         }
         return;
     }
     deq.clear();
-    if (debug_mode) {
+    if (debug_mode()) {
             std::cerr << "strdeque_clear: deque " << id << " cleared\n";
         }
 }
@@ -213,36 +225,36 @@ int strdeque_comp(unsigned long id1, unsigned long id2){
     my_deq& deq2 = find_deq(id2, success2);
     if(!success1) {
         if (!success2) {
-            if (debug_mode) {
+            if (debug_mode()) {
                 std::cerr << "strdeque_comp: deque " << id1 << " and deque " << id2 << " do not exist\n";
             }
             return 0;
         }
         if (deq2.size() == 0) {
-            if (debug_mode) {
+            if (debug_mode()) {
                 std::cerr << "strdeque_comp: deque " << id1 << " does not exist and deque " << id2 << " has size 0\n";
             }
             return 0;
         }
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_comp: deque " << id1 << " does not exist\n";
         }
         return -1;
     }
     if (!success2) {
         if (deq1.size() == 0) {
-            if (debug_mode) {
+            if (debug_mode()) {
                 std::cerr << "strdeque_comp: deque " << id2 << " does not exist and deque " << id1 << " has size 0\n";
             }
             return 0;
         }
-        if (debug_mode) {
+        if (debug_mode()) {
             std::cerr << "strdeque_comp: deque " << id2 << " does not exist\n";
         }
         return 1;
     }
     int comp = comp_not_null (deq1, deq2);
-    if (debug_mode) {
+    if (debug_mode()) {
         std::cerr << "strdeque_comp: result of comparing deque " << id1 << " to " << "deque " << id2 << " is " << comp << "\n";
     }
     return comp;
