@@ -2,6 +2,7 @@
 #include <map>
 #include <deque>
 #include <iostream>
+#include<assert.h>
 #include "strdeque.h"
 #include "strdequeconst.h"
 
@@ -11,7 +12,6 @@ static bool debug_mode = true;
 #define NDEBUG
 debug_mode = false;
 #endif // DNDEBUG
-#include<assert.h>
 
 namespace {
 
@@ -31,7 +31,7 @@ namespace {
     unsigned long next_id() {
         static unsigned long next_id=0;
         next_id++;
-        assert(next_id == 0);
+        assert(next_id != 0);
         return next_id;
     }
 
@@ -92,11 +92,12 @@ void strdeque_delete(unsigned long id) {
 size_t strdeque_size(unsigned long id) {
     bool success = false;
     my_deq& deq = find_deq(id, success);
-    if(!success)
+    if(!success) {
         if (debug_mode) {
             std::cerr << "strdeque_size: deque does not exist\n";
         }
         return 0;
+    }
     if (debug_mode) {
         std::cerr << "strdeque_size: " << deq.size() << "\n";
     }
