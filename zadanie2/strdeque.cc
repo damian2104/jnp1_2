@@ -3,11 +3,17 @@
 #include <deque>
 #include <iostream>
 #include "strdeque.h"
+#include "strdequeconst.h"
 
 namespace {
 
     typedef std::deque<std::string> my_deq;
     typedef std::map <unsigned long, my_deq> my_map;
+
+    unsigned long& const_id(){
+        static unsigned long id = emptystrdeque();
+        return id;
+    }
 
     my_map& strings() {
         static my_map* strings = new my_map;
@@ -59,11 +65,12 @@ unsigned long strdeque_new() {
 }
 
 void strdeque_delete(unsigned long id) {
+    if(id == const_id())
+        return;
     strings().erase(id);
 }
 
 size_t strdeque_size(unsigned long id) {
-
     bool success = false;
     my_deq& deq = find_deq(id, success);
     if(!success)
@@ -73,9 +80,11 @@ size_t strdeque_size(unsigned long id) {
 
 
 void strdeque_insert_at(unsigned long id, size_t pos, const char* value) {
+    if (id == const_id() || value == NULL)
+        return;
     bool success = false;
     my_deq& deq = find_deq(id, success);
-    if(!success || value == NULL)
+    if(!success)
         return;
     if (pos > deq.size())
         deq.insert(deq.end(), value);
@@ -86,6 +95,8 @@ void strdeque_insert_at(unsigned long id, size_t pos, const char* value) {
 }
 
 void strdeque_remove_at(unsigned long id, size_t pos){
+    if(id == const_id())
+        return;
     bool success = false;
     my_deq& deq = find_deq(id, success);
     if(!success || pos >= deq.size())
@@ -102,6 +113,8 @@ const char* strdeque_get_at(unsigned long id, size_t pos){
 }
 
 void strdeque_clear(unsigned long id){
+    if (id == const_id())
+        return;
     bool success = false;
     my_deq& deq = find_deq(id, success);
     if (!success)

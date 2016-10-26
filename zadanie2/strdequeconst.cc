@@ -1,5 +1,7 @@
+#include "strdeque.h"
 #include "strdequeconst.h"
 
 unsigned long emptystrdeque() {
-    return 0;
+    static unsigned long id =  strdeque_new();
+    return id;
 }
