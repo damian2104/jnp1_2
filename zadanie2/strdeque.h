@@ -4,6 +4,7 @@
 
 #ifdef __cplusplus
 
+#include <iostream>
 #include <cstddef>
 
 namespace jnp1 {

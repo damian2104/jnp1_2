@@ -1,4 +1,3 @@
-#include <iostream>
 #include "strdeque.h"
 #include "strdequeconst.h"
 

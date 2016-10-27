@@ -1,7 +1,6 @@
 #include <cstddef>
 #include <map>
 #include <deque>
-#include <iostream>
 #include <cassert>
 #include "strdeque.h"
 #include "strdequeconst.h"
@@ -35,14 +34,14 @@ namespace {
         return next_id;
     }
 
-    string_deq &find_deq(unsigned long id, bool &success) {
+    string_deq &find_deq(unsigned long id, bool &found) {
         deq_map::iterator it;
         it = deques().find(id);
         if (it == deques().end()) {
-            success = false;
+            found = false;
             return *(new string_deq);
         }
-        success = true;
+        found = true;
         return it->second;
     }
 }
