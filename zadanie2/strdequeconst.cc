@@ -8,19 +8,11 @@ static const bool debug = true;
 static const bool debug = false;
 #endif
 
-namespace {
 
-
-    bool debug_mode() {
-        static std::ios_base::Init init;
-        return debug;
-    }
-}
-
-unsigned long emptystrdeque() {
-   if (debug_mode()) {
+unsigned long jnp1::emptystrdeque() {
+    if (debug) {
         std::cerr << "emptystrdeque()\n";
     }
-    static unsigned long id =  strdeque_new();
+    static unsigned long id = jnp1::strdeque_new();
     return id;
 }

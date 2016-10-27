@@ -2,12 +2,16 @@
 #define CONSTSTRDEQUE_H
 
 #ifdef __cplusplus
-extern "C" {
+
+namespace jnp1 {
+
+    extern "C" {
 #endif
 
-unsigned long emptystrdeque();
+    unsigned long emptystrdeque();
 
 #ifdef __cplusplus
+    }
 }
 #endif
 

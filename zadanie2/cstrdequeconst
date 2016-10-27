@@ -1,8 +1,6 @@
 #ifndef CSTRDEQUECONST
 #define CSTRDEQUECONST
 
-namespace jnp1{
-    #include "strdequeconst.h"
-}
+#include "strdequeconst.h"
 
 #endif //CSTRDEQUECONST
